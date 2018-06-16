@@ -22,10 +22,13 @@ ltmain.sh
 
 y.*
 
-# es
+# fsh
 
 initial.c
 sigmsgs.c
 token.h
-es
-esdump
+fsh
+fshdump
+
+# Editors
+*~

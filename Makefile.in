@@ -66,11 +66,11 @@ GEN	= esdump y.tab.c y.tab.h y.output token.h sigmsgs.c initial.c
 
 SIGFILES = @SIGFILES@
 
-es	: ${OFILES} initial.o
-	${CC} -o es ${LDFLAGS} ${OFILES} initial.o ${LIBS}
+fsh	: ${OFILES} initial.o
+	${CC} -o fsh ${LDFLAGS} ${OFILES} initial.o ${LIBS}
 
-esdump	: ${OFILES} dump.o
-	${CC} -o esdump ${LDFLAGS} ${OFILES} dump.o ${LIBS}
+fshdump	: ${OFILES} dump.o
+	${CC} -o fshdump ${LDFLAGS} ${OFILES} dump.o ${LIBS}
 
 clean	:
 	rm -f es ${OFILES} ${GEN} dump.o initial.o
@@ -82,16 +82,16 @@ distclean:	clean
 MANIFEST:
 	find . -type f | sed s/..// > MANIFEST
 
-install : es
+install : fsh
 	$(MKDIR_P) $(bindir)
-	$(INSTALL) -s $(srcdir)/es $(bindir)
+	$(INSTALL) -s $(srcdir)/fsh $(bindir)
 	$(MKDIR_P) $(mandir)/man1
 	$(INSTALL) $(srcdir)/doc/es.1 $(mandir)/man1
 
 test	: trip
 
-trip	: es $(srcdir)/trip.es
-	./es < $(srcdir)/trip.es
+trip	: fsh $(srcdir)/trip.es
+	./fsh < $(srcdir)/trip.es
 
 src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}
@@ -102,8 +102,8 @@ y.tab.c y.tab.h : parse.y
 token.h : y.tab.h
 	-cmp -s y.tab.h token.h || cp y.tab.h token.h
 
-initial.c : esdump $(srcdir)/initial.es
-	./esdump < $(srcdir)/initial.es > initial.c
+initial.c : fshdump $(srcdir)/initial.es
+	./fshdump < $(srcdir)/initial.es > initial.c
 
 sigmsgs.c : mksignal $(SIGFILES)
 	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.c

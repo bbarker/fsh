@@ -325,9 +325,10 @@ extern List *fsplit(const char *sep, List *list, Boolean coalesce);
 
 /* signal.c */
 
-extern int signumber(const char *name);
-extern char *signame(int sig);
-extern char *sigmessage(int sig);
+void set_sig_count();
+int  signumber(const char *name);
+char *signame(int sig);
+char *sigmessage(int sig);
 
 #define	SIGCHK() sigchk()
 typedef enum {

@@ -109,8 +109,8 @@ PRIM(cd) {
 
 PRIM(setsignals) {
 	int i;
-	Sigeffect effects[NSIG];
-	for (i = 0; i < NSIG; i++)
+	Sigeffect effects[SIGRTMAX];
+	for (i = 0; i < SIGRTMAX; i++)
 		effects[i] = sig_default;
 	Ref(List *, lp, list);
 	for (; lp != NULL; lp = lp->next) {

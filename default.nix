@@ -7,4 +7,9 @@ in
   stdenv.mkDerivation {
   name = "fsh-${version}";
   buildInputs = [ ats2 autoconf automake libtool readline yacc ];
+  
+  shellHook = ''
+    # The following will go into makeFlags
+    export CC=patscc
+  '';
 }

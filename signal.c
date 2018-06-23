@@ -2,6 +2,7 @@
 
 #include "es.h"
 #include "sigmsgs.h"
+#include <stdio.h>
 
 typedef Sigresult (*Sighandler)(int);
 
@@ -11,8 +12,9 @@ jmp_buf slowlabel;
 Atomic slow = FALSE;
 Atomic interrupted = FALSE;
 static Atomic sigcount;
-static Atomic caught[NSIG];
-static Sigeffect sigeffect[NSIG];
+static Atomic *caught;
+static Sigeffect *sigeffect;
+static size_t sigeffect_sz;
 
 #if HAVE_SIGACTION
 #ifndef	SA_NOCLDSTOP
@@ -27,11 +29,18 @@ static Sigeffect sigeffect[NSIG];
 #endif
 
 
+void set_sig_count() {
+  caught = malloc(SIGRTMAX * sizeof(Atomic));
+  //
+  sigeffect_sz = SIGRTMAX * sizeof(Sigeffect);
+  sigeffect = malloc(sigeffect_sz);
+}
+
 /*
  * name<->signal mappings
  */
 
-extern int signumber(const char *name) {
+int signumber(const char *name) {
 	int i;
 	char *suffix;
 	if (!hasprefix(name, "sig"))
@@ -40,12 +49,12 @@ extern int signumber(const char *name) {
 		if (streq(signals[i].name, name))
 			return signals[i].sig;
 	i = strtol(name + 3, &suffix, 10);
-	if (0 < i && i < NSIG && (suffix == NULL || *suffix == '\0'))
+	if (0 < i && i < SIGRTMAX && (suffix == NULL || *suffix == '\0'))
 		return i;
 	return -1;
 }
 
-extern char *signame(int sig) {
+char *signame(int sig) {
 	int i;
 	for (i = 0; i < nsignals; i++)
 		if (signals[i].sig == sig)
@@ -53,7 +62,7 @@ extern char *signame(int sig) {
 	return str("sig%d", sig);
 }
 
-extern char *sigmessage(int sig) {
+char *sigmessage(int sig) {
 	int i;
 	for (i = 0; i < nsignals; i++)
 		if (signals[i].sig == sig)
@@ -108,7 +117,7 @@ static Sighandler setsignal(int sig, Sighandler handler) {
 
 extern Sigeffect esignal(int sig, Sigeffect effect) {
 	Sigeffect old;
-	assert(0 < sig && sig <= NSIG);
+	assert(0 < sig && sig <= SIGRTMAX);
 	old = sigeffect[sig];
 	if (effect != sig_nochange && effect != old) {
 		switch (effect) {
@@ -143,12 +152,12 @@ extern Sigeffect esignal(int sig, Sigeffect effect) {
 
 extern void setsigeffects(const Sigeffect effects[]) {
 	int sig;
-	for (sig = 1; sig < NSIG; sig++)
+	for (sig = 1; sig < SIGRTMAX; sig++)
 		esignal(sig, effects[sig]);
 }
 
 extern void getsigeffects(Sigeffect effects[]) {
-	memcpy(effects, sigeffect, sizeof sigeffect);
+	memcpy(effects, sigeffect, sigeffect_sz);
 }
 
 
@@ -161,13 +170,13 @@ extern void initsignals(Boolean interactive, Boolean allowdumps) {
 	Push settor;
 
 	for (sig = 0; sig < nsignals; sig++)
-		if (signals[sig].sig < 1 || NSIG <= signals[sig].sig)
+		if (signals[sig].sig < 1 || SIGRTMAX <= signals[sig].sig)
 			panic(
 				"initsignals: bad signal in sigmsgs.c: %s (see mksignal)",
 				signals[sig].name
 			);
 
-	for (sig = 1; sig < NSIG; sig++) {
+	for (sig = 1; sig < SIGRTMAX; sig++) {
 		Sighandler h;
 #if HAVE_SIGACTION
 		struct sigaction sa;
@@ -208,7 +217,7 @@ extern void initsignals(Boolean interactive, Boolean allowdumps) {
 
 extern void setsigdefaults(void) {
 	int sig;
-	for (sig = 1; sig < NSIG; sig++) {
+	for (sig = 1; sig < SIGRTMAX; sig++) {
 		Sigeffect e = sigeffect[sig];
 		if (e == sig_catch || e == sig_noop || e == sig_special)
 			esignal(sig, sig_default);
@@ -227,8 +236,8 @@ extern Boolean issilentsignal(List *e) {
 }
 
 extern List *mksiglist(void) {
-	int sig = NSIG;
-	Sigeffect effects[NSIG];
+	int sig = SIGRTMAX;
+	Sigeffect effects[SIGRTMAX];
 	getsigeffects(effects);
 	Ref(List *, lp, NULL);
 	while (--sig > 0) {
@@ -286,7 +295,7 @@ extern void sigchk(void) {
 			caught[sig] = 0;
 			break;
 		}
-		if (sig >= NSIG) {
+		if (sig >= SIGRTMAX) {
 			sigcount = 0;
 			return;
 		}

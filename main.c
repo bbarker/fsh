@@ -113,6 +113,8 @@ int main(int argc, char **argv) {
 	Boolean keepclosed = FALSE;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
 
+	set_sig_count();
+
 	initgc();
 	initconv();
 

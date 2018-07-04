@@ -1,6 +1,9 @@
 # c
 *.o
 
+# ATS intermediats
+*_dats.c
+
 # http://www.gnu.org/software/autoconf
 
 /autom4te.cache

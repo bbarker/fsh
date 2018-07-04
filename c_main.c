@@ -100,7 +100,7 @@ static noreturn usage(void) {
 
 
 /* main -- initialize, parse command arguments, and start running */
-int main(int argc, char **argv) {
+int c_main(int argc, char **argv) {
 	int c;
 	volatile int ac;
 	char **volatile av;

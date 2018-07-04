@@ -49,14 +49,15 @@ LIBS	= $(ADDLIBS) @LIBS@
 
 VPATH = $(srcdir)
 
+DATS_FILES = main.dats
 HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
 	  stdenv.h syntax.h term.h var.h
 CFILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
-	  glom.c input.c heredoc.c list.c main.c match.c open.c opt.c \
+	  glom.c input.c heredoc.c list.c c_main.c match.c open.c opt.c \
 	  prim-ctl.c prim-etc.c prim-io.c prim-sys.c prim.c print.c proc.c \
 	  sigmsgs.c signal.c split.c status.c str.c syntax.c term.c token.c \
 	  tree.c util.c var.c vec.c version.c y.tab.c dump.c
-OFILES	= access.o closure.o conv.o dict.o eval.o except.o fd.o gc.o glob.o \
+OFILES	= access.o c_main.o closure.o conv.o dict.o eval.o except.o fd.o gc.o glob.o \
 	  glom.o input.o heredoc.o list.o main.o match.o open.o opt.o \
 	  prim-ctl.o prim-etc.o prim-io.o prim-sys.o prim.o print.o proc.o \
 	  sigmsgs.o signal.o split.o status.o str.o syntax.o term.o token.o \
@@ -94,7 +95,7 @@ trip	: fsh $(srcdir)/trip.es
 	./fsh < $(srcdir)/trip.es
 
 src	:
-	@echo ${OTHER} ${CFILES} ${HFILES}
+	@echo ${OTHER} ${CFILES} ${HFILES} ${DATS_FILES}
 
 y.tab.c y.tab.h : parse.y
 	${YACC} -vd $(srcdir)/parse.y
@@ -114,7 +115,8 @@ config.h  : config.h.in
 
 # --- dependencies ---
 
-access.o : access.c es.h config.h stdenv.h prim.h 
+access.o : access.c es.h config.h stdenv.h prim.h
+c_main.o : c_main.c es.h config.h stdenv.h
 closure.o : closure.c es.h config.h stdenv.h gc.h 
 conv.o : conv.c es.h config.h stdenv.h print.h 
 dict.o : dict.c es.h config.h stdenv.h gc.h 
@@ -127,7 +129,7 @@ glom.o : glom.c es.h config.h stdenv.h gc.h
 input.o : input.c es.h config.h stdenv.h input.h 
 heredoc.o : heredoc.c es.h config.h stdenv.h gc.h input.h syntax.h 
 list.o : list.c es.h config.h stdenv.h gc.h 
-main.o : main.c es.h config.h stdenv.h 
+main.o : main.dats
 match.o : match.c es.h config.h stdenv.h 
 open.o : open.c es.h config.h stdenv.h 
 opt.o : opt.c es.h config.h stdenv.h 

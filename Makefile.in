@@ -67,6 +67,9 @@ GEN	= esdump y.tab.c y.tab.h y.output token.h sigmsgs.c initial.c
 
 SIGFILES = @SIGFILES@
 
+%.o: %.dats
+	$(CC) -c -o $@ $<
+
 fsh	: ${OFILES} initial.o
 	${CC} -o fsh ${LDFLAGS} ${OFILES} initial.o ${LIBS}
 
@@ -74,7 +77,7 @@ fshdump	: ${OFILES} dump.o
 	${CC} -o fshdump ${LDFLAGS} ${OFILES} dump.o ${LIBS}
 
 clean	:
-	rm -f es ${OFILES} ${GEN} dump.o initial.o
+	rm -f fsh ${OFILES} ${GEN} dump.o initial.o *~  *_?ats.c
 
 distclean:	clean
 	rm -f config.cache config.log config.h Makefile cscope.out tags TAGS core cs.out config.status ltmain.sh

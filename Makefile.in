@@ -35,6 +35,7 @@ srcdir  = @srcdir@
 
 
 SHELL	= /bin/sh
+# Note that typically (always?) CC should be patscc
 CC	= @CC@
 INSTALL	= @INSTALL@
 MKDIR_P = @MKDIR_P@
@@ -68,7 +69,7 @@ GEN	= esdump y.tab.c y.tab.h y.output token.h sigmsgs.c initial.c
 SIGFILES = @SIGFILES@
 
 %.o: %.dats
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 fsh	: ${OFILES} initial.o
 	${CC} -o fsh ${LDFLAGS} ${OFILES} initial.o ${LIBS}

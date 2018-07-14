@@ -1,5 +1,8 @@
 
-#include "share/atspre_staload.hats"
+
+#define ATS_DYNLOADFLAG 0
+
+//#include "share/atspre_staload.hats"
 
 
 typedef FormatStruct = $extype"Format"
